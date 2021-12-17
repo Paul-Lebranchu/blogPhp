@@ -69,18 +69,51 @@ $("#connexion").click(function(){
 
 //gestion de l'inscription
 //formulaire d'inscription
-let inscription ="<label for='userInscription'>Nom utilisateur : </label>";
-inscription += "<input type='text' id='userInscription' name='userInscription' required><br><br>";
-inscription +="<label for='passwordInscription'>Mot de passe : </label>"
-inscription += "<input type='password' id='passwordInscription' name='passwordinscription' required><br><br>";
-inscription +="<label for='mail'>Adresse mail : </label>"
-inscription += "<input type='mail' id='mail' name='mail' required><br><br>";
-inscription +="<label for='tel'>Téléphone : </label>"
-inscription += "<input type='tel' id='tel' name='tel' required ><br><br>";
-inscription +="<label for='image'>Photo de profil : </label>"
-inscription += "<input type='file' name='image' id='image' accept='image/png, image/jpeg'><br><br>";
-inscription += "<input type='submit' value='Inscription'>";
 
+let inscription = "<div class='row'>";
+
+inscription +="<div class='form-group col'>";
+inscription+= "<label for='userInscription'>* Nom utilisateur : </label>";
+inscription += "<input type='text'class='form-control' id='userInscription' name='userInscription' onchange='verifUserName()'>";
+inscription += "<p class='err' id='errUserName'> </p> ";
+inscription += "</div>";
+
+inscription +="<div class='form-group col'>";
+inscription +="<label for='passwordInscription'>* Mot de passe : </label>";
+inscription += "<input type='password' class='form-control' id='passwordInscription' name='passwordInscription'>";
+inscription += "<p class='err' id='errPassword'> </p>";
+inscription += "</div>";
+
+inscription += "<br></div>";
+inscription += "<div class='row'>";
+
+inscription +="<div class='form-group col'>";
+inscription += "<label for='mail'>* Adresse mail : </label>";
+inscription += "<input type='email' class='form-control' id='mail' name='mail' placeholder='ex : xyz@exemple.com' onchange='verifMail()'>";
+inscription += "<p class='err' id='errMail'> </p>";
+inscription +="</div>";
+
+inscription +="<div class='form-group col'>";
+inscription += "<label for='tel'>* Téléphone (format: 0123456789): </label>";
+inscription += "<input type='tel' class='form-control' id='tel' name='tel' pattern='[0-9]{10}' placeholder ='ex: 0123456789'>";
+inscription += "<p class='err' id='errTel'> </p>";
+inscription += "</div>";
+
+inscription += "<br></div>";
+inscription += "<div class='row'>";
+
+inscription +="<div class='form-group col'>";
+inscription +="<label for='image'>Photo de profil : </label>";
+inscription += "<input class='form-control-file form-control ' type='file' name='image' id='image' accept='image/png, image/jpeg'>";
+inscription += "<br></div>";
+
+inscription += "</div>";
+inscription += "<div class='row'>";
+
+inscription +="<div class='form-group'>";
+inscription += "<input class='btn btn-primary' type='submit' value='Inscription'> ";
+inscription += "</div>";
+inscription += "<br></div>";
 //faire apparaitre le forumaire d'inscription
 $("#inscription").click(function(){
 
@@ -100,24 +133,108 @@ function inscriptionUtilisateur(){
 	let mail = document.getElementById("mail").value;
 	let tel = document.getElementById("tel").value;
 	let image = document.getElementById("image").value;
-	/* WIP: faire les verife dans le formulaire(verif que le nom d'utilisateur n'est pas déjà)
-	+ meilleur message d'erreur dans formulaire  + redirection vers page de profil si inscription réussie
-	+ création d'une variable session*/
-	let ajax = new XMLHttpRequest();
-	ajax.open("POST", "../Inscription_Connexion/inscription.php", true);
-	ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	ajax.send("userName=" + userName + "&password=" + password + "&mail= " + mail
-    + "&tel=" + tel + "&image=" + image);
+	//récupère la valeur du champ d'erreur du nom  d'utilisateur et de l'adresse mail
+	let errUse = $('#errUserName').text();
+	let errMailverif = $('#errMail').text();
+	//vérifie que les champs du formulaire soit bien rempli
+	var formOk = 1;
+	//erreur nom utilisateur: champ vide ou pseudo déjà pris
+	if(errUse == "Votre pseudo est déjà utilisé par un autre membre"){
+		formOk = 0;
+	}else{
+		if(userName == ""){
+			$('#errUserName').text("veuillez renseignez un nom d'utilisateur svp");
+			formOk = 0;
+		}else{
+			$('#errUserName').text("");
+		}
+	}
+	//erreur mot de passe
+	if(password == ""){
+		$('#errPassword').text("veuillez renseignez un mot de passe svp");
+		formOk = 0;
+	}else{
+		$('#errPassword').text("");
+	}
+	//erreur adresse mail: mail non renseignez ou mail déjà utilisée
+	if(errMailverif == "Votre adresse mail est déjà utilisée"){
+		formOk = 0;
+	}else{
+		if(mail == ""){
+			$('#errMail').text("veuillez renseignez une adresse mail svp");
+			formOk = 0;
+		}
+		else{
+			$('#errMail').text("");
+		}
+	}
 
-	ajax.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			alert("inscription réussie");
+	//erreur numéro de téléphone
+	if(tel == ""){
+		$('#errTel').text("veuillez renseignez un numéro de téléphone svp");
+		formOk = 0;
+	}else{
+		$('#errTel').text("");
+	}
+	/* WIP: redirection vers page de profil si inscription réussie
+	+ création d'une variable session + enregistrer la photo en local*/
+	if(formOk == 1){
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Inscription_Connexion/inscription.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("userName=" + userName + "&password=" + password + "&mail=" + mail
+	    + "&tel=" + tel + "&image=" + image);
+
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				alert("inscription réussie");
+			}
+
 		}
 
 	}
 	return false;
 }
 
+function verifUserName(){
+	let userName = document.getElementById("userInscription").value;
+	let ajax = new XMLHttpRequest();
+	ajax.open("POST", "../Inscription_Connexion/verifUserNameDisponible.php", true);
+	ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	ajax.send("userName=" + userName);
+	ajax.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base
+			let data = JSON.parse(this.responseText);
+			if(data[0]['count(userName)'] != 0){
+				$('#errUserName').text("Votre pseudo est déjà utilisé par un autre membre");
+			}else{
+				$('#errUserName').text("");
+			}
+		}
+	}
+}
+
+function verifMail(){
+	let mail = document.getElementById("mail").value;
+	let ajax = new XMLHttpRequest();
+	ajax.open("POST", "../Inscription_Connexion/verifMailDispo.php", true);
+	ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	ajax.send("mail=" + mail);
+	ajax.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base
+			let data = JSON.parse(this.responseText);
+			console.log(data);
+			console.log(data[0]['count(mail)']);
+			if(data[0]['count(mail)'] != 0){
+				$('#errMail').text("Votre adresse mail est déjà utilisée");
+			}else{
+				$('#errMail').text("");
+			}
+		}
+	}
+}
 //politique de confidentialité
 let confidential = "<p> Vos données seront utilisées dans le but de vous identifier et de vous montrer le contenu accesible pour vous. </p>";
 confidential += "<p> Votre adresse mail et votre numéro de téléphone seront utilisées pour vous contactez en cas de problèmes. Ces données ne sont pas accesible aux autres utilisateurs </p>";
