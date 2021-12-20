@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 include "varGlobale.php";
 
 //Connexion à la base de données mysql

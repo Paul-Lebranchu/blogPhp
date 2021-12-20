@@ -1,5 +1,4 @@
 <?php
-
 include "Commun/connexion.php";
 include "Commun/footer.php";
 include "Commun/menu.php";
@@ -32,7 +31,9 @@ include "Commun/menu.php";
 					<button class="btn btn-primary" id="inscription"> Inscription </button>
 				</sdiv>
 				<div>
-					<form id='log' method="post" enctype="multipart/form-data">
+					<form id='log' method="post" enctype="multipart/form-data ">
+						<fieldset>
+						</fieldset>
 					</form>
 				</div>
 
@@ -42,6 +43,9 @@ include "Commun/menu.php";
 
 				<div id="confidentiel">
 				</div>
+				<?php session_start();
+				echo $_SESSION['coul']; ?>
+				
 			</div>
 		</main>
 
@@ -53,24 +57,103 @@ include "Commun/menu.php";
 <script>
 //gestion de la connexion:
 //formulaire de connexion
-let connexion ="<label for='user'>Nom utilisateur : </label>";
-connexion += "<input type='text' id='user' name='user' required><br><br>";
+let connexion = "<fieldset>";
+connexion += " <legend>Connexion</legend>";
+connexion += "<div class='row'>";
+
+connexion +="<div class='form-group col'>";
+connexion +="<label for='user'>Nom utilisateur : </label>";
+connexion += "<input type='text' id='user' name='user' onchange='verifUserNameConnexion()'>";
+connexion += "<p class='err' id='errUserName'> </p> ";
+connexion += "</div>";
+
+connexion +="<div class='form-group col'>";
 connexion +="<label for='password'>Mot de passe : </label>"
-connexion += "<input type='password' id='password' name='password' required><br><br>";
-connexion += "<input type='submit' value='Connexion'>";
+connexion += "<input type='password' id='password' name='password'>";
+connexion += "<p class='err' id='errPassword'> </p> ";
+connexion += "</div>";
+
+connexion += "<div class='form-group col'>";
+connexion += "<input type='submit' value='Connexion' class='btn btn-primary'>";
+connexion += "</div>";
+
+connexion += "</div>";
+connexion += "</fieldset>";
 //faire apparaitre le formulaire de connexion
 $("#connexion").click(function(){
 	//supprime contenu du formulaire
 	$("#log").empty();
 	//recréer contenu formulaire
 	$("#log").html(connexion);
+	//
+	$("#log").attr('onsubmit', 'return connexionUser()');
 })
+//chargement formulaire connexion par défaut
+$("#log").html(connexion);
+$("#log").attr('onsubmit', 'return connexionUser()');
 //action appellant le script de connexion
+function connexionUser(){
+	//récupère valeur champ formulaire
+	let userName = document.getElementById("user").value;
+	let password = document.getElementById("password").value;
+
+	//récupère le message erreur utilisateur si il existe
+	let errUse = $('#errUserName').text();
+
+	//gestion des erreurs champs vide ou pseudo inexistant
+	let formOk= 1;
+
+	if(errUse == "Votre pseudo n'existe pas!"){
+		formOk = 0;
+	}else{
+		if(userName == ""){
+			$('#errUserName').text("veuillez renseignez un nom d'utilisateur svp");
+			formOk = 0;
+		}else{
+			$('#errUserName').text("");
+		}
+	}
+
+	//erreur mot de passe
+	if(password == ""){
+		$('#errPassword').text("veuillez renseignez un mot de passe svp");
+		formOk = 0;
+	}else{
+		$('#errPassword').text("");
+	}
+
+	//requête pour se connecter
+	if(formOk == 1){
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Inscription_Connexion/connexion.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("userName=" + userName + "&password=" + password);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//regarde si il ya message d'erreur
+				let data = JSON.parse(this.responseText);
+				//connexion et redirection
+				if (data == 'ok'){
+					alert("connexion réussie");
+					document.location.href="/Profil/myprofil.php";
+				}
+				//mot de passe erronée
+				else{
+					$('#errPassword').text("Votre mot de passe est erroné");
+				}
+
+			}
+		}
+	}
+	return false;
+}
 
 //gestion de l'inscription
 //formulaire d'inscription
 
-let inscription = "<div class='row'>";
+let inscription = "<fieldset>";
+inscription += " <legend>Inscription</legend>";
+inscription +="<div class='row'>";
 
 inscription +="<div class='form-group col'>";
 inscription+= "<label for='userInscription'>* Nom utilisateur : </label>";
@@ -103,8 +186,9 @@ inscription += "<br></div>";
 inscription += "<div class='row'>";
 
 inscription +="<div class='form-group col'>";
+inscription +="<input type='hidden' name='MAX_FILE_SIZE' value='500'>";
 inscription +="<label for='image'>Photo de profil : </label>";
-inscription += "<input class='form-control-file form-control ' type='file' name='image' id='image' accept='image/png, image/jpeg'>";
+inscription += "<input class='form-control-file form-control ' type='file' name='image' id='image' accept='image/jpeg'>";
 inscription += "<br></div>";
 
 inscription += "</div>";
@@ -114,6 +198,9 @@ inscription +="<div class='form-group'>";
 inscription += "<input class='btn btn-primary' type='submit' value='Inscription'> ";
 inscription += "</div>";
 inscription += "<br></div>";
+
+inscription += "</fieldset>";
+
 //faire apparaitre le forumaire d'inscription
 $("#inscription").click(function(){
 
@@ -179,23 +266,23 @@ function inscriptionUtilisateur(){
 	/* WIP: redirection vers page de profil si inscription réussie
 	+ création d'une variable session + enregistrer la photo en local*/
 	if(formOk == 1){
+		//requête pour créer le profil
 		let ajax = new XMLHttpRequest();
 		ajax.open("POST", "../Inscription_Connexion/inscription.php", true);
 		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		ajax.send("userName=" + userName + "&password=" + password + "&mail=" + mail
 	    + "&tel=" + tel + "&image=" + image);
-
 		ajax.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
 				alert("inscription réussie");
+				document.location.href="/Profil/myprofil.php";
 			}
-
 		}
-
 	}
 	return false;
 }
 
+//verifie si le nom d'utilisateur n'est pas utilisé (inscritpion)
 function verifUserName(){
 	let userName = document.getElementById("userInscription").value;
 	let ajax = new XMLHttpRequest();
@@ -215,6 +302,7 @@ function verifUserName(){
 	}
 }
 
+//vérifie si l'adresse mail n'est pas déjà utilisée (inscription)
 function verifMail(){
 	let mail = document.getElementById("mail").value;
 	let ajax = new XMLHttpRequest();
@@ -225,8 +313,6 @@ function verifMail(){
 		if (this.readyState == 4 && this.status == 200) {
 			//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base
 			let data = JSON.parse(this.responseText);
-			console.log(data);
-			console.log(data[0]['count(mail)']);
 			if(data[0]['count(mail)'] != 0){
 				$('#errMail').text("Votre adresse mail est déjà utilisée");
 			}else{
@@ -235,6 +321,27 @@ function verifMail(){
 		}
 	}
 }
+
+//vérifie si le nom d'utilisateur existe (connexion)
+function verifUserNameConnexion(){
+	let userName = document.getElementById("user").value;
+	let ajax = new XMLHttpRequest();
+	ajax.open("POST", "../Inscription_Connexion/verifUserNameDisponible.php", true);
+	ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	ajax.send("userName=" + userName);
+	ajax.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base
+			let data = JSON.parse(this.responseText);
+			if(data[0]['count(userName)'] != 0){
+				$('#errUserName').text("");
+			}else{
+				$('#errUserName').text("Votre pseudo n'existe pas!");
+			}
+		}
+	}
+}
+
 //politique de confidentialité
 let confidential = "<p> Vos données seront utilisées dans le but de vous identifier et de vous montrer le contenu accesible pour vous. </p>";
 confidential += "<p> Votre adresse mail et votre numéro de téléphone seront utilisées pour vous contactez en cas de problèmes. Ces données ne sont pas accesible aux autres utilisateurs </p>";
