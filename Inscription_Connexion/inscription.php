@@ -15,6 +15,7 @@
 	//On enregistrer notre image
 	file_put_contents($image, file_get_contents($url));
 
+	$image = '../Asset/PhotoProfil/'.$_POST["userName"].'.jpg';
 	//création du compte
 	$requete = "INSERT INTO utilisateur (userName, password, tel, mail, image)
 	VALUES (:userName, :password, :tel, :mail, :image)";
