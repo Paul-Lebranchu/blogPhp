@@ -4,7 +4,7 @@ if(!key_exists('id',$_SESSION)){
 	$menu ="
 		<nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
 			<div class = 'container-fluid'>
-				<a class='navbar-brand' href='..'>login</a>
+				<a class='navbar-brand' href='..'>Login</a>
 			</div>
 		</nav>
 	";

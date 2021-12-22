@@ -30,9 +30,9 @@ include "../Commun/deconnexion.php";
 					//div des boutons
 					echo "<div id='control' class='row'>";
 						//bouton édition de profil
-						echo("<div class='col-2'><button class='btn btn-warning'>Edition le profil </button></div>");
+						echo("<div class='col-2'><button class='btn btn-warning'>Editer le profil </button></div>");
 						//bouton de suppression de profil
-						echo("<div class='col-2'><button class='btn btn-danger'>Supprimer le profil </button></div>");
+						echo("<div class='col-2'><button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'>Supprimer le profil </button></div>");
 					echo("</div>");
 				}
 				//utilistaeur hors ligne-> remis en page de connexion
@@ -40,6 +40,26 @@ include "../Commun/deconnexion.php";
 					header('location: ../');
 				}
 				 ?>
+			</div>
+
+			<!-- Modal pour la suppresion profil -->
+			<div class="modal fade" id="delModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Suppression de compte</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<p> Voulez-vous vraiment supprimer  définitivement votre compte?</p>
+							<p> Vos article et vos commentaire resteront affichés mais vous ne serez plus identifiés dessus </p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" id="confirmDel" data-bs-dismiss="modal">Supprimer mon compte</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</main>
 		<?php echo $footer;?>
@@ -77,4 +97,31 @@ include "../Commun/deconnexion.php";
 			$('#profil').html(html);
 		}
 	};
+	//Supression de profil
+	function suppression(){
+		let ajax = new XMLHttpRequest();
+		ajax.open("GET", "deleteProfil.php", true);
+		ajax.send();
+
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				alert("suppression réussi");
+				//redirection vers page d'accueil
+				document.location.href="../";
+			}
+		}
+	}
+	//bouton suppression faisant apparaitre modal de suppresion de profil
+	//paramètre modal suppression
+	let delCompte = document.getElementById('delModal');
+	delCompte.addEventListener('show.bs.modal', function (event) {
+		//lien bouton suppression de la modal de suppression - fonction suppression
+		$('#confirmDel').click(function(){
+			suppression();
+		});
+
+	})
+
+
+	//edition de profil
 </script>
