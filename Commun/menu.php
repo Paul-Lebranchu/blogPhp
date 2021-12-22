@@ -21,12 +21,30 @@ else{
 							<a class='navbar-brand' href='../ProfilListe/listeProfil.php'>Liste des profils</a>
 						</li>
 					</ul>
-					<button class='btn btn-outline-danger' id='deco'> Déconnexion</button>
+					<button class='btn btn-outline-danger' id='deco' onclick='deconnexion()'> Déconnexion</button>
 				</div>
 			</div>
 		</nav>
 	";
 }
  ?>
+
+<script>
+
+function deconnexion(){
+	//supression de la variable session id
+	let ajax = new XMLHttpRequest();
+	ajax.open("GET", "../Inscription_Connexion/deconnexion.php", true);
+	ajax.send();
+
+	ajax.onreadystatechange = function () {
+		if (this.readyState == 4 && this.status == 200) {
+			//alerte de redirection vers la page d'accueil
+			alert("Vous avez été déconnectez, vous allez être redirigé vers la page de connexion");
+			//redirection
+			document.location.href="../";
+		}
+	}
+}
 
 </script>

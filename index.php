@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "Commun/connexion.php";
 include "Commun/footer.php";
 include "Commun/menu.php";
@@ -17,39 +18,46 @@ include "Commun/menu.php";
 
 	<body class="bg-dark">
 
-		<?php echo $menu;?>
+		<?php echo $menu;
+		echo $_SESSION['id'];
+		if(!key_exists('id',$_SESSION)){
+			$content = '<main class="bg-light">
+				<div class = "container">
+					<h1> Page de connexion/inscription </h1>
 
-		<main class="bg-light">
-			<div class = "container">
-				<h1> Page d'accueil / connexion </h1>
+					<p> Bienvenue! veuillez remplir vous connecter ou vous inscrire si vous n avez
+					pas encore créer de compte </p>
 
-				<p> Bienvenue! veuillez remplir vous connecter ou vous inscrire si vous n'avez
-				pas encore créer de compte </p>
+					<div>
+						<button class="btn btn-primary" id="connexion"> Connexion </button>
+						<button class="btn btn-primary" id="inscription"> Inscription </button>
+					</sdiv>
+					<div>
+						<form id="log" method="post" enctype="multipart/form-data ">
+							<fieldset>
+							</fieldset>
+						</form>
+					</div>
 
-				<div>
-					<button class="btn btn-primary" id="connexion"> Connexion </button>
-					<button class="btn btn-primary" id="inscription"> Inscription </button>
-				</sdiv>
-				<div>
-					<form id='log' method="post" enctype="multipart/form-data ">
-						<fieldset>
-						</fieldset>
-					</form>
+					<div>
+						<button class="btn btn-info" id="rgpd"> Politique de confidentialité des données </button>
+					</div>
+
+					<div id="confidentiel">
+					</div>
+
 				</div>
-
-				<div>
-					<button class="btn btn-info" id="rgpd"> Politique de confidentialité des données </button>
-				</div>
-
-				<div id="confidentiel">
-				</div>
-				<?php session_start();
-				echo $_SESSION['coul']; ?>
-				
-			</div>
-		</main>
-
-		<?php echo $footer; ?>
+			</main>';
+		}else{
+			$content  = '<main class="bg-light">
+					<div class = "container">
+					<h1> Page de connexion/inscription </h1>
+					<p> Vous êtes déjà connectez à votre compte </p>
+					</div>
+			</main>';
+		}
+		echo $content;
+		echo $footer; ?>
 
 	</body>
 </html>
