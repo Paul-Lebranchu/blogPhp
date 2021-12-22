@@ -3,6 +3,21 @@ include "../Commun/connexion.php";
 include "../Commun/footer.php";
 include "../Commun/menu.php";
 include "../Commun/deconnexion.php";
+
+//récupère les valeurs du profil pour la modal d'édition du profil
+$requete = "SELECT userName, tel, mail, image FROM utilisateur WHERE id= :id";
+$res = $bd->prepare($requete);
+$res->execute( array(
+	":id" => $_SESSION['id']
+));
+$resultat = $res->fetch();
+
+//rajoute élément pour transformer en chaine de caractère dans javascript
+$userName = "'".$resultat["userName"]."'";
+$mail = "'".$resultat["mail"]."'";
+
+
+
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -27,12 +42,6 @@ include "../Commun/deconnexion.php";
 				if(key_exists('id', $_SESSION)){
 					//créer la div qui continedra les infos sur le profil, contenu généré par script
 					echo ("<div id='profil'></div>");
-					//div des boutons
-					echo "<div id='control' class='row'>";
-						//bouton édition de profil
-						echo("<div class='col-2'><button class='btn btn-warning'>Editer le profil </button></div>");
-						//bouton de suppression de profil
-						echo("<div class='col-2'><button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'>Supprimer le profil </button></div>");
 					echo("</div>");
 				}
 				//utilistaeur hors ligne-> remis en page de connexion
@@ -61,6 +70,54 @@ include "../Commun/deconnexion.php";
 					</div>
 				</div>
 			</div>
+
+			<!-- Modal pour l'édition de profil -->
+			<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Modification de compte</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form>
+							<div class='row'>
+
+								<div class='form-group col'>
+									<label for='userInscription'>* Nom utilisateur : </label>
+									<input type='text'class='form-control' id='userEdit' name='userEdit' value=<?php echo $resultat['userName']?> onchange='verifUserName()'>
+									<p class='err' id='errUserName'> </p>
+								</div>
+
+							<br></div>
+							<div class='row'>
+
+								<div class='form-group col'>
+									<label for='mail'>* Adresse mail : </label>
+									<input type='email' class='form-control' id='mailEdit' name='mailEdit' value=<?php echo $resultat['mail']?> placeholder='ex : xyz@exemple.com' onchange='verifMail()'>
+									<p class='err' id='errMail'> </p>
+								</div>
+
+								<div class='form-group col'>
+									<label for='tel'>* Téléphone : </label>
+									<input type='tel' class='form-control' id='telEdit' name='telEdit' value=<?php echo $resultat['tel']?> pattern='[0-9]{10}' placeholder ='ex: 0123456789'>
+									<p class='err' id='errTel'> </p>
+								</div>
+
+							<br></div>
+							<div class='row'>
+
+								<div class='modal-footer'>
+									<input class='btn btn-warning' id ='confirmEdit' type='submit' value='Modifier le compte'>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+								</div>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<?php echo ($mail ."<br>".$userName);?>
 		</main>
 		<?php echo $footer;?>
 	</body>
@@ -80,17 +137,25 @@ include "../Commun/deconnexion.php";
 			//créé le html du profil
 			let html = "<div class='row align-items-center'>";
 
-			html += "<div class = 'col-3'>"
-			html += "<img class='img-thumbnail' src='" + data.image + "' alt='image du profil de " + data.userName +"'>";
+			html += "<div class = 'col-3' >"
+				html += "<img class='img-thumbnail' src='" + data.image + "' alt='image du profil de " + data.userName +"'>";
+				html += "<button class='btn btn-info'>Editer la photo de profil </button>";
 			html +="</div>"
 
 			html += "<div class = 'col-9'>"
-			html += "<p id='user'> Nom d'utilistaeur : " + data.userName + "</p>";
-			html += "<p id='mail'> Mail : " + data.mail + "</p>";
-			html += "<p id='tel'> Téléphone : " + data.tel + "</p>";
-			html += "<p id='nbArticle'> Nombre d'article écrit : WIP </p>";
-			html += "<p id='nbCom'> Nombre de commentaire écrit : WIP</p>";
-			html +="</div>"
+				html += "<p id='user'> Nom d'utilistaeur : " + data.userName + "</p>";
+				html += "<p id='mail'> Mail : " + data.mail + "</p>";
+				html += "<p id='tel'> Téléphone : " + data.tel + "</p>";
+				html += "<p id='nbArticle'> Nombre d'article écrit : WIP </p>";
+				html += "<p id='nbCom'> Nombre de commentaire écrit : WIP</p>";
+
+				//bouton édition de profil
+				html += "<button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editModal'>Editer le profil </button>";
+				//bouton de suppression de profil
+				html += "<button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'>Supprimer le profil </button>";
+				//bouton modification mot de passe
+				html += "<button class='btn btn-success'>Modifier le mot de passe </button>";
+				html +="</div>"
 
 			html +="</div>"
 			//ajout le code html au profil
@@ -112,7 +177,6 @@ include "../Commun/deconnexion.php";
 		}
 	}
 	//bouton suppression faisant apparaitre modal de suppresion de profil
-	//paramètre modal suppression
 	let delCompte = document.getElementById('delModal');
 	delCompte.addEventListener('show.bs.modal', function (event) {
 		//lien bouton suppression de la modal de suppression - fonction suppression
@@ -124,4 +188,63 @@ include "../Commun/deconnexion.php";
 
 
 	//edition de profil
+
+	//bouton suppression faisant apparaitre modal de suppresion de profil
+	let editCompte = document.getElementById('editModal');
+	editCompte.addEventListener('show.bs.modal', function (event) {
+		//lien bouton suppression de la modal de suppression - fonction suppression
+		$('#confirmEdit').click(function(){
+			alert("WIP");
+		});
+
+	})
+
+
+	//fonction lié au forlulaire d'édition (vérification mail et vérification pseudo dispo)
+
+	//verifie si le nom d'utilisateur n'est pas utilisé (version édition)
+	function verifUserName(){
+		//récupère le nom actuel du compte et le nom présent dans le formulaire
+		let actualName = <?php echo $userName; ?>;
+		let userName = document.getElementById("userEdit").value;
+
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Profil/verifUserNameDisponibleEdit.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("userName=" + userName + "&actualName=" + actualName);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base (sauf si il s'agit de l'ancien pseudo du compte)
+				let data = JSON.parse(this.responseText);
+				if(data[0]['count(userName)'] != 0){
+					$('#errUserName').text("Votre pseudo est déjà utilisé par un autre membre");
+				}else{
+					$('#errUserName').text("");
+				}
+			}
+		}
+	}
+
+	//vérifie si l'adresse mail n'est pas déjà utilisée (version édition)
+	function verifMail(){
+		//récupère le mail actuel du compte et le mail présent dans le formulaire
+		let actualMail = <?php echo $mail; ?>;
+		let mail = document.getElementById("mailEdit").value;
+
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Profil/verifMailDispoEdit.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("mail=" + mail +"&actualMail=" + actualMail);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//parse les données renvoyés par la requête et vérifie que le mail n'est pas dans la base (sauf si il s'agit de l'ancien mail du compte)
+				let data = JSON.parse(this.responseText);
+				if(data[0]['count(mail)'] != 0){
+					$('#errMail').text("Votre adresse mail est déjà utilisée");
+				}else{
+					$('#errMail').text("");
+				}
+			}
+		}
+	}
 </script>

@@ -9,7 +9,7 @@ if(!key_exists('id',$_SESSION)){
 		</nav>
 	";
 }
-//menu utilistauers connectésf403
+//menu utilistauers connectés
 else{
 	$menu ="
 		<nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
