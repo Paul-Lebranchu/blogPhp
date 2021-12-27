@@ -12,5 +12,4 @@
 	$resultat = $res->fetchAll();
 	echo json_encode($resultat);
 
-
 ?>

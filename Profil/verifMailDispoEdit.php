@@ -5,11 +5,9 @@
 	$res = $bd->prepare($requete);
 	$res->execute( array(
 		":mail" => $_POST['mail'],
-		":actualMail" => $_POST['mail']
+		":actualMail" => $_POST['actualMail']
 	));
 
 	$resultat = $res->fetchAll();
 	echo json_encode($resultat);
-
-
 ?>

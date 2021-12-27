@@ -2,7 +2,7 @@
 include "../Commun/connexion.php";
 include "../Commun/footer.php";
 include "../Commun/menu.php";
-include "../Commun/deconnexion.php";
+
 
 //récupère les valeurs du profil pour la modal d'édition du profil
 $requete = "SELECT userName, tel, mail, image FROM utilisateur WHERE id= :id";
@@ -42,7 +42,6 @@ $mail = "'".$resultat["mail"]."'";
 				if(key_exists('id', $_SESSION)){
 					//créer la div qui continedra les infos sur le profil, contenu généré par script
 					echo ("<div id='profil'></div>");
-					echo("</div>");
 				}
 				//utilistaeur hors ligne-> remis en page de connexion
 				else{
@@ -84,23 +83,24 @@ $mail = "'".$resultat["mail"]."'";
 							<div class='row'>
 
 								<div class='form-group col'>
-									<label for='userInscription'>* Nom utilisateur : </label>
-									<input type='text'class='form-control' id='userEdit' name='userEdit' value=<?php echo $resultat['userName']?> onchange='verifUserName()'>
+									<label for='userEdit'>* Nom utilisateur : </label>
+									<input type='text' class='form-control' id='userEdit' name='userEdit' value='<?php echo $resultat['userName']?>' onchange='verifUserName()'>
 									<p class='err' id='errUserName'> </p>
 								</div>
 
 							<br></div>
+
 							<div class='row'>
 
 								<div class='form-group col'>
-									<label for='mail'>* Adresse mail : </label>
-									<input type='email' class='form-control' id='mailEdit' name='mailEdit' value=<?php echo $resultat['mail']?> placeholder='ex : xyz@exemple.com' onchange='verifMail()'>
+									<label for='mail'>* Mail : </label>
+									<input type='email' class='form-control' id='mailEdit' name='mailEdit' value='<?php echo $resultat['mail']?>' placeholder='ex : xyz@exemple.com' onchange='verifMail()'>
 									<p class='err' id='errMail'> </p>
 								</div>
 
 								<div class='form-group col'>
 									<label for='tel'>* Téléphone : </label>
-									<input type='tel' class='form-control' id='telEdit' name='telEdit' value=<?php echo $resultat['tel']?> pattern='[0-9]{10}' placeholder ='ex: 0123456789'>
+									<input type='tel' class='form-control' id='telEdit' name='telEdit' value='<?php echo $resultat['tel']?>' pattern='[0-9]{10}' placeholder ='ex: 0123456789'>
 									<p class='err' id='errTel'> </p>
 								</div>
 
@@ -117,7 +117,49 @@ $mail = "'".$resultat["mail"]."'";
 					</div>
 				</div>
 			</div>
-			<?php echo ($mail ."<br>".$userName);?>
+
+			<!-- Modal de modifcation de mot de passe -->
+			<div class="modal fade" id="editPassModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Modification de mot de passe</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form>
+							<div class='row'>
+
+								<div class='form-group col'>
+									<label for='newPass'>* Nouveau mode passe : </label>
+									<input type='password' class='form-control' id='newPass' name='newPass'>
+									<p class='err' id='errPass'> </p>
+								</div>
+
+							<br></div>
+
+							<div class='row'>
+
+								<div class='form-group col'>
+									<label for='confirm'>* Confirmation nouveau mot de passe : </label>
+									<input type='password' class='form-control' id='confirm' name='confirm'>
+									<p class='err' id='errConfirm'> </p>
+									<p class='err' id='errDiff'> </p>
+								</div>
+
+							<br></div>
+							<div class='row'>
+
+								<div class='modal-footer'>
+									<input class='btn btn-warning' id ='changePass' type='submit' value='Modifier le mot de passe'>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+								</div>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 		<?php echo $footer;?>
 	</body>
@@ -154,7 +196,7 @@ $mail = "'".$resultat["mail"]."'";
 				//bouton de suppression de profil
 				html += "<button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'>Supprimer le profil </button>";
 				//bouton modification mot de passe
-				html += "<button class='btn btn-success'>Modifier le mot de passe </button>";
+				html += "<button class='btn btn-success' data-bs-toggle='modal' data-bs-target='#editPassModal'>Modifier le mot de passe </button>";
 				html +="</div>"
 
 			html +="</div>"
@@ -188,19 +230,87 @@ $mail = "'".$resultat["mail"]."'";
 
 
 	//edition de profil
-
-	//bouton suppression faisant apparaitre modal de suppresion de profil
+	//bouton édition profil faisant apparaitre modal de suppresion de profil
 	let editCompte = document.getElementById('editModal');
 	editCompte.addEventListener('show.bs.modal', function (event) {
 		//lien bouton suppression de la modal de suppression - fonction suppression
 		$('#confirmEdit').click(function(){
-			alert("WIP");
+			//récupère le resultat de la function edit
+			let res = edit();
+			/* si res vaut 0, il y a des erreur dans le formulaire et on ne souhaite pas fermer
+			la modal -> return false */
+			if(res == 0){
+				return false;
+			}
 		});
 
 	})
-
-
 	//fonction lié au forlulaire d'édition (vérification mail et vérification pseudo dispo)
+	function edit(){
+		//récupère élément du formulaire
+		let userName = document.getElementById('userEdit').value;
+		let mail = document.getElementById('mailEdit').value;
+		let tel = document.getElementById('telEdit').value;
+
+		//récupère les erreurs qui peuvent être généré par verifMail et verifUserName
+		let errUse = $('#errUserName').text();
+		let errMailverif = $('#errMail').text();
+
+		//initialise la valeur à retourner
+		let formOk = 1;
+
+		//verifie qu'il n'y ait pas d'erreur dans le formualaire
+		//userName
+		if(errUse == "Votre pseudo est déjà utilisé par un autre membre"){
+			formOk = 0;
+		}else{
+			if(userName == ""){
+				$('#errUserName').text("veuillez renseignez un nom d'utilisateur svp");
+				formOk = 0;
+			}else{
+				$('#errUserName').text("");
+			}
+		}
+
+		//mail
+		if(errMailverif == "Votre adresse mail est déjà utilisée"){
+			formOk = 0;
+		}else{
+			if(mail == ""){
+				$('#errMail').text("veuillez renseignez une adresse mail svp");
+				formOk = 0;
+			}
+			else{
+				$('#errMail').text("");
+			}
+		}
+
+		//tel
+		if(tel == ""){
+			$('#errTel').text("veuillez renseignez un numéro de téléphone svp");
+			formOk = 0;
+		}else{
+			$('#errTel').text("");
+		}
+		//si formOk vaut 1, execute le script d'édition de profil
+		if (formOk == 1){
+
+			let ajax = new XMLHttpRequest();
+			ajax.open("POST", "editProfil.php", true);
+			ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			ajax.send("userName=" + userName + "&mail=" + mail
+		    + "&tel=" + tel);
+			ajax.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					alert("Modifiaction de profil réussie");
+					document.location.href="/Profil/myprofil.php";
+				}
+			}
+			return false;
+		}
+		//retourne formOk pour tester si l'on doit fermé ou non la modal d'édition
+		return formOk;
+	}
 
 	//verifie si le nom d'utilisateur n'est pas utilisé (version édition)
 	function verifUserName(){
@@ -231,20 +341,69 @@ $mail = "'".$resultat["mail"]."'";
 		let actualMail = <?php echo $mail; ?>;
 		let mail = document.getElementById("mailEdit").value;
 
-		let ajax = new XMLHttpRequest();
-		ajax.open("POST", "../Profil/verifMailDispoEdit.php", true);
-		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		ajax.send("mail=" + mail +"&actualMail=" + actualMail);
-		ajax.onreadystatechange = function () {
-			if (this.readyState == 4 && this.status == 200) {
-				//parse les données renvoyés par la requête et vérifie que le mail n'est pas dans la base (sauf si il s'agit de l'ancien mail du compte)
-				let data = JSON.parse(this.responseText);
-				if(data[0]['count(mail)'] != 0){
-					$('#errMail').text("Votre adresse mail est déjà utilisée");
-				}else{
-					$('#errMail').text("");
+
+	}
+
+	//changer le mot de passe
+	function editPass(){
+		//reset des erreurs
+		$('#errPass').text("");
+		$('#errConfirm').text("");
+		$('#errDiff').text("");
+		//récupère la valeur du nouveau mot de passe et vérifie qu'elle est identique au mot de passe de confirmation
+		let newPass = document.getElementById("newPass").value;
+		let confirm = document.getElementById("confirm").value;
+
+		//variable contenant le res de la comparaison
+		let compare = 1;
+
+		//verif des erreurs
+		if(newPass == ""){
+			$('#errPass').text("Vous devez indiquez un nouveau mot de passe");
+			compare = 0;
+		}
+		if(confirm == ""){
+			$('#errConfirm').text("Vous devez confirmez votre nouveau mot de passe");
+			compare = 0;
+		}
+		if(newPass != confirm){
+			$('#errDiff').text("Votre mot de passe et votre confirmation sont différents");
+		}
+
+		//si les deux mots de passe sont non vides et qu'ils sont identiques, change le mot de passe + déconnecte
+		if(compare == 1){
+			//requete de modification du mot de passe
+			let ajax = new XMLHttpRequest();
+			ajax.open("POST", "editMotDePasse.php", true);
+			ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			ajax.send("password=" + newPass);
+			ajax.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					alert("Modifiaction du mot de passe réussie");
+					//appel script deconnexion
+					deconnexion();
 				}
 			}
+			return false;
 		}
+		return compare;
 	}
+
+	//bouton edition mot de passe faisant apparaitre  modal d'édition de mot de passe
+	let editPassword = document.getElementById('editPassModal');
+	editPassword.addEventListener('show.bs.modal', function (event) {
+		//lien bouton suppression de la modal de suppression - fonction suppression
+		$('#changePass').click(function(){
+			//changement du mot de passe et déconnexion
+			let res = editPass();
+			//si le mot de passe et la confirmation ne sont pas identique, ou un champ est nulle, on ne modifie pas le mot de passe
+			if(res == 0){
+				return false;
+			}
+		});
+
+	})
+
+
+	//changer la photo de profil
 </script>

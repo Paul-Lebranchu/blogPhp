@@ -31,7 +31,7 @@ include "Commun/menu.php";
 					<div>
 						<button class="btn btn-primary" id="connexion"> Connexion </button>
 						<button class="btn btn-primary" id="inscription"> Inscription </button>
-					</sdiv>
+					</div>
 					<div>
 						<form id="log" method="post" enctype="multipart/form-data ">
 							<fieldset>

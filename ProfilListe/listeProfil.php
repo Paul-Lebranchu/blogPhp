@@ -2,7 +2,7 @@
 include "../Commun/connexion.php";
 include "../Commun/footer.php";
 include "../Commun/menu.php";
-include "../Commun/deconnexion.php";
+
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -25,6 +25,7 @@ include "../Commun/deconnexion.php";
 				<?php
 				//si utilistauer connecté
 				if(key_exists('id', $_SESSION)){
+					//formulaire de recherche d'utilisateur
 					//créer la table qui contiendra les infos le nom des profils, leur image et un lien vers leur page
 					echo("<table class='table table-dark table-striped table-bordered table-responsive table-hover'>
 							<thead>
