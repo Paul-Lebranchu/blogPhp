@@ -387,6 +387,7 @@ $mail = "'".$resultat["mail"]."'";
 		}
 		if(newPass != confirm){
 			$('#errDiff').text("Votre mot de passe et votre confirmation sont différents");
+			compare = 0;
 		}
 
 		//si les deux mots de passe sont non vides et qu'ils sont identiques, change le mot de passe + déconnecte
