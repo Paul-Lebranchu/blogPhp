@@ -83,23 +83,22 @@ $mail = "'".$resultat["mail"]."'";
 							<div class='row'>
 
 								<div class='form-group col'>
-									<label for='userEdit'>* Nom utilisateur : </label>
+									<label for='userEdit'>* Mail : </label>
 									<input type='text' class='form-control' id='userEdit' name='userEdit' value='<?php echo $resultat['userName']?>' onchange='verifUserName()'>
 									<p class='err' id='errUserName'> </p>
 								</div>
 
 							<br></div>
-
 							<div class='row'>
 
 								<div class='form-group col'>
-									<label for='mail'>* Mail : </label>
+									<label for='mailEdit'>* Mail : </label>
 									<input type='email' class='form-control' id='mailEdit' name='mailEdit' value='<?php echo $resultat['mail']?>' placeholder='ex : xyz@exemple.com' onchange='verifMail()'>
 									<p class='err' id='errMail'> </p>
 								</div>
 
 								<div class='form-group col'>
-									<label for='tel'>* Téléphone : </label>
+									<label for='telEdit'>* Téléphone : </label>
 									<input type='tel' class='form-control' id='telEdit' name='telEdit' value='<?php echo $resultat['tel']?>' pattern='[0-9]{10}' placeholder ='ex: 0123456789'>
 									<p class='err' id='errTel'> </p>
 								</div>
@@ -273,11 +272,12 @@ $mail = "'".$resultat["mail"]."'";
 		}
 
 		//mail
-		if(errMailverif == "Votre adresse mail est déjà utilisée"){
+		let regMail = /[a-z]*@[a-z]*\.[a-z]{2,3}/
+		if(errMailverif == "Votre adresse mail est déjà utilisée par un autre membre"){
 			formOk = 0;
 		}else{
-			if(mail == ""){
-				$('#errMail').text("veuillez renseignez une adresse mail svp");
+			if(mail == "" || !(regMail.test(mail))){
+				$('#errMail').text("veuillez renseignez une adresse mail valide svp");
 				formOk = 0;
 			}
 			else{
@@ -286,8 +286,9 @@ $mail = "'".$resultat["mail"]."'";
 		}
 
 		//tel
-		if(tel == ""){
-			$('#errTel').text("veuillez renseignez un numéro de téléphone svp");
+		let regTel = /[0-9]{10}/;
+		if(tel == "" || !(regTel.test(tel))){
+			$('#errTel').text("veuillez renseignez un numéro de téléphone valide svp (format 10 chiffres)");
 			formOk = 0;
 		}else{
 			$('#errTel').text("");
@@ -332,7 +333,9 @@ $mail = "'".$resultat["mail"]."'";
 					$('#errUserName').text("");
 				}
 			}
+
 		}
+		return false;
 	}
 
 	//vérifie si l'adresse mail n'est pas déjà utilisée (version édition)
@@ -341,7 +344,23 @@ $mail = "'".$resultat["mail"]."'";
 		let actualMail = <?php echo $mail; ?>;
 		let mail = document.getElementById("mailEdit").value;
 
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Profil/verifMailDispoEdit.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("mail=" + mail + "&actualMail=" + actualMail);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//parse les données renvoyés par la requête et vérifie que le pseudo n'est pas dans la base (sauf si il s'agit de l'ancien pseudo du compte)
+				let data = JSON.parse(this.responseText);
+				if(data[0]['count(mail)'] != 0){
+					$('#errMail').text("Votre adresse mail est déjà utilisée par un autre membre");
+				}else{
+					$('#errMail').text("");
+				}
+			}
 
+		}
+		return false;
 	}
 
 	//changer le mot de passe
@@ -403,7 +422,6 @@ $mail = "'".$resultat["mail"]."'";
 		});
 
 	})
-
 
 	//changer la photo de profil
 </script>
