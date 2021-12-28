@@ -11,7 +11,11 @@
 	$image = $currentdir.'/Asset/PhotoProfil/'.$_POST["userName"].'.jpg';
 
 	//on récupère notre image (photo temporaire le temps de réussir à envoyer image)
-	$url = "https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg";
+	if($_POST['image'] == ""){
+		$url = "https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg";
+	}else{
+		$url = $_POST['image'];
+	}
 	//On enregistrer notre image
 	file_put_contents($image, file_get_contents($url));
 
