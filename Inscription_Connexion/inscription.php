@@ -21,8 +21,7 @@
 
 	$image = '../Asset/PhotoProfil/'.$_POST["userName"].'.jpg';
 	//création du compte
-	$requete = "INSERT INTO utilisateur (userName, password, tel, mail, image)
-	VALUES (:userName, :password, :tel, :mail, :image)";
+	$requete = "INSERT INTO utilisateur (userName, password, tel, mail, image) VALUES (:userName, :password, :tel, :mail, :image)";
 
 	$res = $bd->prepare($requete);
 	$res->execute( array(
@@ -33,5 +32,7 @@
 		":image" => $image,
 	));
 	$_SESSION['id'] = $bd->lastInsertId();
+
 	echo $bd->lastInsertId();
+	var_dump($_FILES);
 ?>

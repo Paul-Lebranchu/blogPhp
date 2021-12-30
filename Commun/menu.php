@@ -20,6 +20,9 @@ else{
 						<li class='nav-item'>
 							<a class='navbar-brand' href='../ProfilListe/listeProfil.php'>Liste des profils</a>
 						</li>
+						<li class='nav-item'>
+							<a class='navbar-brand' href='../Article/listeArticle.php'>Articles</a>
+						</li>
 					</ul>
 					<button class='btn btn-outline-danger' id='deco' onclick='deconnexion()'> Déconnexion</button>
 				</div>
