@@ -60,7 +60,7 @@ if(!key_exists('id', $_SESSION)){
 
 				html += "<tr data-id='" + data[i].id +"'>";
 					html += "<td> <a href='../Profil/profil.php?id=" + data[i].auteur + "'> " + data[i].userName + " </a></td>";
-					html += "<td> " + data[i].titre + " </td>";
+					html += "<td> <a href='article.php?id=" + data[i].id + "&auteur=" + data[i].userName + "&titre= " + data[i].titre +"'>" + data[i].titre + " </a> </td>";
 				html += "</tr>";
 			}
 			$('#article').html(html);

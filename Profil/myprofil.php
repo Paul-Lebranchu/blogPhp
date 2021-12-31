@@ -179,7 +179,7 @@ $mail = "'".$resultat["mail"]."'";
 			let html = "<div class='row align-items-center'>";
 
 			html += "<div class = 'col-3' >"
-				html += "<img class='img-thumbnail' src='" + data.image + "' alt='image du profil de " + data.userName +"'>";
+				html += "<img class='img-thumbnail rounded-circle' src='" + data.image + "' alt='image du profil de " + data.userName +"'>";
 				html += "<button class='btn btn-info'>Editer la photo de profil </button>";
 			html +="</div>"
 
@@ -187,8 +187,8 @@ $mail = "'".$resultat["mail"]."'";
 				html += "<p id='user'> Nom d'utilistaeur : " + data.userName + "</p>";
 				html += "<p id='mail'> Mail : " + data.mail + "</p>";
 				html += "<p id='tel'> Téléphone : " + data.tel + "</p>";
-				html += "<p id='nbArticle'> Nombre d'article écrit : WIP </p>";
-				html += "<p id='nbCom'> Nombre de commentaire écrit : WIP</p>";
+				html += "<p id='nbArticle'> Nombre d'article écrit : " + data.nbArticle + " </p>";
+				html += "<p id='nbCom'> Nombre de commentaire écrit : " + data.nbCom + "</p>";
 
 				//bouton édition de profil
 				html += "<button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editModal'>Editer le profil </button>";

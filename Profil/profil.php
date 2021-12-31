@@ -14,6 +14,23 @@ $res->execute( array(
 ));
 $resultat = $res->fetch();
 
+//compte le nombre d'article écrit par l'utilisateur
+$requete2 = "SELECT count(*) FROM article WHERE auteur = :id";
+$res2 = $bd->prepare($requete2);
+$res2->execute( array(
+	":id" => $id
+));
+$nbArticle = $res2->fetch();
+$resultat["nbArticle"] = $nbArticle[0];
+
+//compte le nombre de commentaie écrit par l'utilisteur
+$requete3 = "SELECT count(*) FROM commentaire WHERE auteur = :id";
+$res3 = $bd->prepare($requete3);
+$res3->execute( array(
+	":id" => $id
+));
+$nbCom = $res3->fetch();
+$resultat["nbCom"] = $nbCom[0];
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -41,15 +58,15 @@ $resultat = $res->fetch();
 								<div class='row align-items-center'>
 
 									<div class = 'col-3'>
-										<img class='img-thumbnail' src='" . $resultat['image'] . "' alt='image du profil de " .$resultat['userName'] . "'>
+										<img class='img-thumbnail rounded-circle' src='" . $resultat['image'] . "' alt='image du profil de " .$resultat['userName'] . "'>
 									</div>
 
 									<div class = 'col-9'>
 										<p id='user'> Nom d'utilistaeur : " . $resultat['userName'] . "</p>
 										<p id='mail'> Mail : " . $resultat['mail'] . "</p>
 										<p id='tel'> Téléphone : " . $resultat['tel'] . "</p>
-										<p id='nbArticle'> Nombre d'article écrit : WIP </p>
-										<p id='nbCom'> Nombre de commentaire écrit : WIP</p>
+										<p id='nbArticle'> Nombre d'article écrit : ". $resultat['nbArticle']." </p>
+										<p id='nbCom'> Nombre de commentaire écrit :". $resultat['nbCom'] ."</p>
 									</div>
 
 								</div>

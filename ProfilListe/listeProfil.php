@@ -71,10 +71,10 @@ include "../Commun/menu.php";
 			//créé le html contenant les ligne de la table des profils
 			for(let i = 0; i < data.length; i++){
 				html += "<tr data-id='" + data[i].id +"'>";
-					html += "<td> <img width='100px' src='" + data[i].image + "' alt = 'image de profil de :" + data[i].userName +"'> </td>";
+					html += "<td> <img class='rounded-circle' width='100px' src='" + data[i].image + "' alt = 'image de profil de :" + data[i].userName +"'> </td>";
 					html += "<td> <a href='../Profil/profil.php?id=" + data[i].id + "'>" + data[i].userName + " </a></td>";
-					html += "<td> WIP </td>";
-					html += "<td> WIP </td>";
+					html += "<td> " + data[i].nbArticle + " </td>";
+					html += "<td> " + data[i].nbCom + " </td>";
 				html += "</tr>";
 			}
 			//ajout le code html à la table des profils
