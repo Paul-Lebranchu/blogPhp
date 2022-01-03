@@ -193,12 +193,6 @@ inscription += "</div>";
 inscription += "<br></div>";
 inscription += "<div class='row'>";
 
-inscription +="<div class='form-group col'>";
-inscription +="<input type='hidden' name='MAX_FILE_SIZE' value='100000000000'>";
-inscription +="<label for='image'>Photo de profil : </label>";
-inscription += "<input class='form-control-file form-control ' type='file' name='image' id='image' accept='image/jpeg'>";
-inscription += "<br></div>";
-
 inscription += "</div>";
 inscription += "<div class='row'>";
 
@@ -227,7 +221,6 @@ function inscriptionUtilisateur(){
 	let password = document.getElementById("passwordInscription").value;
 	let mail = document.getElementById("mail").value;
 	let tel = document.getElementById("tel").value;
-	let image = document.getElementById("image").value;
 
 	//récupère la valeur du champ d'erreur du nom  d'utilisateur et de l'adresse mail
 	let errUse = $('#errUserName').text();
@@ -280,7 +273,7 @@ function inscriptionUtilisateur(){
 		ajax.open("POST", "../Inscription_Connexion/inscription.php", true);
 		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		ajax.send("userName=" + userName + "&password=" + password + "&mail=" + mail
-	    + "&tel=" + tel + "&image=" + image);
+	    + "&tel=" + tel);
 		ajax.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
 				alert("inscription réussie");

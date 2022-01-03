@@ -10,12 +10,9 @@
 	$currentdir = getcwd();
 	$image = $currentdir.'/Asset/PhotoProfil/'.$_POST["userName"].'.jpg';
 
-	//on récupère notre image (photo temporaire le temps de réussir à envoyer image)
-	if($_POST['image'] == ""){
-		$url = "https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg";
-	}else{
-		$url = $_POST['image'];
-	}
+	//on met une image par défaut lors de l'inscription
+	$url = "https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg";
+
 	//On enregistrer notre image
 	file_put_contents($image, file_get_contents($url));
 
