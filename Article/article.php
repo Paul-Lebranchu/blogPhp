@@ -24,6 +24,14 @@ $resAut->execute(array(
 ));
 $resultatAut =$resAut->fetch();
 
+//selection de l'image et du nom d'utilisateur
+$requeteUser =  "SELECT userName, image FROM utilisateur WHERE id = :id";
+$resUser = $bd->prepare($requeteUser);
+$resUser->execute(array(
+	":id" => $_SESSION['id']
+));
+$resultatUser =$resUser->fetch();
+
  ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -47,15 +55,25 @@ $resultatAut =$resAut->fetch();
 					<h2 class='border-bottom'> Auteur :</h2>
 					<!-- affiche l'image et le nom de l'auteur -->
 					<?php $src = $resultatAut['image']; ?>
-					<img src="<?php echo $src?>" alt="image de profil" width='100px;'class="rounded-circle" >
-					<?php echo $_GET['auteur'];
-					//si l'utilisateur connecté est l'auteur de l'article, on va affiché les boutons de créations et de suppression d'article
-					if($_SESSION['id'] == $resultatArt['auteur'] ){
-						echo ("<a href='editArticle.php?id=".$_GET['id']."&auteur=".$resultatAut['id']."'><button class='btn btn-warning'> Modifier article</button></a>");
-						echo ("<button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'> Supprimer l'article</button>");
-					}
+					<table class="table table-success text-center align-middle">
+						<tr>
+							<td width="200px">
+								<figure>
+									<img src="<?php echo $src?>" alt="image de profil" width='100px;' class="rounded-circle" >
+									<?php echo ("<figcaption><a href='../Profil/profil.php?id=".$resultatAut['id']."'>".$_GET['auteur']."</a></figcaption>");
+								echo("</figure>");
+							echo("</td>");
+							echo("<td>");
+								//si l'utilisateur connecté est l'auteur de l'article, on va affiché les boutons de créations et de suppression d'article
+								if($_SESSION['id'] == $resultatArt['auteur'] ){
+									echo ("<a href='editArticle.php?id=".$_GET['id']."&auteur=".$resultatAut['id']."'><button class='btn btn-warning'> Modifier article</button></a>");
+									echo ("<button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delModal'> Supprimer l'article</button>");
+								}
 
-					?>
+							?>
+							</td>
+						</tr>
+					</table>
 
 				</div>
 
@@ -70,13 +88,45 @@ $resultatAut =$resAut->fetch();
 				<div id="comment" class="border border-dark" >
 					<h2 class='border-bottom'> Commentaire(s) </h2>
 
-					<p> WIP </p>
+					<table class="table table-dark table-striped text-center align-middle">
+						<thead>
+							<th width="200px">Utilisateur</th>
+							<th>Commentaire</th>
+						</thead>
+						<tbody id="comments">
+						</tbody>
+					</table>
+					<button class="btn btn-info" id="rafrai"> raffraichir les commentaires </button>
 				</div>
 
 				<div id="newComment" class="border border-dark" >
 					<h2 class='border-bottom' > Poster votre commentaire</h2>
+					<table class="table bg-info text-center align-middle">
+						<tr>
+							<!--Affichage de l'image de profil et du nom de l'utilisateur connecté qui va posté un com -->
+							<td width="200px">
+								<figure>
+								<?php
+								echo ("<img class='rounded-circle' width='100px' src ='".$resultatUser['image']."' alt='image de profil de ".$resultatUser['userName']."' >");
+								echo ("<figcaption>".$resultatUser['userName']."</figcaption>");
+								 ?>
+							 	</figure>
+							</td>
+							<!--Formulaire où on écrit son commentaire et le poste -->
+							<td>
+								<form onsubmit="return addCommentaire()" method="POST">
+									<div class='form-group col'>
+										<textarea class="form-control z-depth-1" rows="10" id="contenu" name="contenu"></textarea>
+										<p class='err' id='errContenu' > </p>
+									</div>
+									<div class='form-group col'>
+										<input class="btn btn-dark" type="submit" id='addCom' name='addCom' value='Publier votre commentaire'>
+									</div>
+								</form>
+							</td>
+						</tr>
+					</table>
 
-					<p> WIP </p>
 				</div>
 			</div>
 
@@ -107,7 +157,50 @@ $resultatAut =$resAut->fetch();
 
 <script>
 
-	//partie modification de l'article
+	//affiche les commentaire
+	function refreshCom(){
+		let auteur  = <?php echo $_SESSION['id']?>;
+		let article = <?php echo $_GET['id']?>;
+		//vide la table des com
+		$('#comments').empty();
+		//charge les commentaire lié à l'article
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Commentaire/getAllCom.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send("article="+article);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				let data = JSON.parse(this.responseText);
+
+				let html = "";
+				for (let a = 0; a < data.length; a++) {
+
+					html += "<tr>";
+						//image + pseudo
+						html += "<td> <figure>";
+						html += "<img class='rounded-circle' width='100px' src='"+data[a].image+"'>";
+						html += "<figcaption><a href='../Profil/profil.php?id="+data[a].auteur+"'>"+data[a].userName+"</a></figcaption>";
+						//bouton de suppression si c'est le bon utilisateur de connecter
+						if(auteur == data[a].auteur ){
+							html += "<button width='100' class='btn btn-danger' > Supprimer votre commentaire </button>";
+						}
+						html += "</figure></td>";
+						//commentaire
+						html += "<td>" + data[a].contenu + "</td>";
+					html += "</tr>";
+				}
+
+				document.getElementById("comments").innerHTML += html;
+			}
+		};
+	}
+	//appelle de la fonction chargeant les com
+	refreshCom();
+
+	//ajout de la fonction raftaichir les commentaire aux boutons portant ce nom
+	$('#rafrai').click(function(){
+		refreshCom();
+	})
 
 	//partie suppresion de l'article
 	//bouton suppression faisant apparaitre modal de suppresion de profil
@@ -136,6 +229,33 @@ $resultatAut =$resAut->fetch();
 				document.location.href="/Article/listeArticle.php";
 			}
 		}
+	}
+
+	//ajout d'un commentaire
+	function addCommentaire(){
+		//récupère le contenu du commentaire et l'identifiant de l'article
+		let com = document.getElementById("contenu").value;
+		let article = <?php echo $_GET['id'];?>;
+		//message d'erreur
+		if(com == ""){
+			$('#errContenu').text("Vous n'avez pas mis de contenu dans votre commentaire!");
+		}
+		else{
+			$('#errContenu').text("");
+			let ajax = new XMLHttpRequest();
+			ajax.open("POST", "../Commentaire/addCom.php" ,true);
+			ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			ajax.send( "com=" + com + "&article=" + article);
+			ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//alerte confirmant la suppresion et redirection vers la liste des articles
+				alert("Commentaire ajouté!");
+				}
+			}
+		}
+		//rafraichit la table de commentaire pour ajouter le nouveau commentaire et rafraichir la table
+		refreshCom();
+		return false;
 	}
 
 </script>

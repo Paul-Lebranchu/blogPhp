@@ -36,7 +36,7 @@ include "../Commun/menu.php";
 				if(key_exists('id', $_SESSION)){
 					//formulaire de recherche d'utilisateur
 					//créer la table qui contiendra les infos le nom des profils, leur image et un lien vers leur page
-					echo("<table class='table table-dark table-striped table-bordered table-responsive table-hover'>
+					echo("<table class='table table-dark table-striped table-bordered table-responsive table-hover text-center align-middle'>
 							<thead>
 								<th> Photo de profil</th>
 								<th> Nom utilisateur </th>

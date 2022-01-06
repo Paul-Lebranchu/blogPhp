@@ -40,7 +40,7 @@ $resultat["nbCom"] = $nbCom[0];
 		<link rel="stylesheet" href="../Style/css/bootstrap.css"  />
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="../Style/jquery/jquery.min.js"></script>
-		<title> Accueil </title>
+		<title> <?php echo $resultat['userName']; ?> </title>
 	</head>
 
 	<body class="bg-dark">

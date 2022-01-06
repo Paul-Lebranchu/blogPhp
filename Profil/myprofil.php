@@ -27,7 +27,7 @@ $mail = "'".$resultat["mail"]."'";
 		<link rel="stylesheet" href="../Style/css/bootstrap.css"  />
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="../Style/jquery/jquery.min.js"></script>
-		<title> Accueil </title>
+		<title> Mon profil </title>
 	</head>
 
 	<body class="bg-dark">
@@ -60,7 +60,7 @@ $mail = "'".$resultat["mail"]."'";
 						</div>
 						<div class="modal-body">
 							<p> Voulez-vous vraiment supprimer  définitivement votre compte?</p>
-							<p> Vos article et vos commentaire resteront affichés mais vous ne serez plus identifiés dessus </p>
+							<p> Vos article et vos commentaire seront également supprimés! </p>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-danger" id="confirmDel" data-bs-dismiss="modal">Supprimer mon compte</button>
@@ -159,6 +159,37 @@ $mail = "'".$resultat["mail"]."'";
 					</div>
 				</div>
 			</div>
+			<!-- Modal pour l'édition de l'image de profil -->
+			<div class="modal fade" id="editImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Modification image de profil</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form method='POST' enctype='multipart/form-data' name='formImg'>
+							<div class='row'>
+
+								<div class='form-group col'>
+									<input type='file' class='form-control' id='image' name='image' accept='image/png, image/jpeg'>
+									<p class='err' id='errImage'> </p>
+								</div>
+
+							<br></div>
+
+							<div class='row'>
+
+								<div class='modal-footer'>
+									<input class='btn btn-warning' id ='changeImage' type='submit' value='Modifier votre avatar'>
+									<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+								</div>
+							</div>
+						</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 		<?php echo $footer;?>
 	</body>
@@ -178,9 +209,9 @@ $mail = "'".$resultat["mail"]."'";
 			//créé le html du profil
 			let html = "<div class='row align-items-center'>";
 
-			html += "<div class = 'col-3' >"
+			html += "<div class = 'col-3 text-center' >"
 				html += "<img class='img-thumbnail rounded-circle' src='" + data.image + "' alt='image du profil de " + data.userName +"'>";
-				html += "<button class='btn btn-info'>Editer la photo de profil </button>";
+				html += "<button class='btn btn-dark' data-bs-toggle='modal' data-bs-target='#editImageModal'>Editer la photo de profil  <p class='text-danger font-weight-bold'>Work In Progress </p> </button>";
 			html +="</div>"
 
 			html += "<div class = 'col-9'>"
@@ -217,7 +248,7 @@ $mail = "'".$resultat["mail"]."'";
 			}
 		}
 	}
-	//bouton suppression faisant apparaitre modal de suppresion de profil
+	//selection bouton suppression faisant apparaitre modal de suppresion de profil
 	let delCompte = document.getElementById('delModal');
 	delCompte.addEventListener('show.bs.modal', function (event) {
 		//lien bouton suppression de la modal de suppression - fonction suppression
@@ -409,7 +440,7 @@ $mail = "'".$resultat["mail"]."'";
 		return compare;
 	}
 
-	//bouton edition mot de passe faisant apparaitre  modal d'édition de mot de passe
+	//selection bouton edition mot de passe faisant apparaitre  modal d'édition de mot de passe
 	let editPassword = document.getElementById('editPassModal');
 	editPassword.addEventListener('show.bs.modal', function (event) {
 		//lien bouton suppression de la modal de suppression - fonction suppression
@@ -425,4 +456,34 @@ $mail = "'".$resultat["mail"]."'";
 	})
 
 	//changer la photo de profil
+
+	//fonction d'édition de l'image de profil  /!\ WIP /!\
+	function editImg(){
+		//selection de la valeur du champ de types files
+		let img = document.getElementById('image').value;
+
+		//variable de verification du champ
+		let formOk = 1;
+		//si le champ est vide, formOk vaut 0 et on indique un message d'erreur dans le formulaire
+		if(img == ""){
+			$('#errImage').text("Vous devez selectionner une image comme nouvelle photo de profil");
+			formOk = 0;
+		}
+		//si le
+		if (formOk == 1){
+			alert("WIP - édition d'image non opérationnelle pour le moment");
+		}
+		return 0;
+	}
+	//selection du bouton d'édition d'image /!\ WIP /!\
+	let editImage = document.getElementById('editImageModal');
+	editImage.addEventListener('show.bs.modal', function(event){
+		//lien bouton de modification d'image
+		$('#changeImage').click(function(){
+			let res = editImg();
+			if(res == 0){
+				return false;
+			}
+		})
+	})
 </script>

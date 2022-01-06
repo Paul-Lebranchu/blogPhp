@@ -28,10 +28,11 @@ if(!key_exists('id', $_SESSION)){
 			<div class = "container">
 				<h1> Liste des articles </h1>
 
-				<table class='table table-dark table-striped table-bordered table-responsive table-hover'>
+				<table class='table table-dark table-striped table-bordered table-responsive table-hover align-middle text-center'>
 					<thead>
 						<th> Auteur </th>
 						<th> Titre </th>
+						<th width='20px'> Nombre de commentaire </th>
 					</thead>
 					<tbody id='article'></tbody>
 				</table>
@@ -59,8 +60,12 @@ if(!key_exists('id', $_SESSION)){
 			for(let i = 0; i < data.length; i++){
 
 				html += "<tr data-id='" + data[i].id +"'>";
-					html += "<td> <a href='../Profil/profil.php?id=" + data[i].auteur + "'> " + data[i].userName + " </a></td>";
+					html += "<td width='200px' class='text-center'> <figure>";
+					html += "<img width ='100px' src='"+data[i].image +"' alt='image de profil' class='rounded-circle'>";
+					html += "<figcaption> <a href='../Profil/profil.php?id=" + data[i].auteur + "'> " + data[i].userName + "</a> </figcaption>";
+					html += "</figure></td>";
 					html += "<td> <a href='article.php?id=" + data[i].id + "&auteur=" + data[i].userName + "&titre= " + data[i].titre +"'>" + data[i].titre + " </a> </td>";
+					html += "<td>" + data[i].com + "</td>";
 				html += "</tr>";
 			}
 			$('#article').html(html);
