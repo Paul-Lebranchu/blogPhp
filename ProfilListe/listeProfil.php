@@ -114,6 +114,7 @@ include "../Commun/menu.php";
 </script>
 
 <style>
+/*Cache le champ de recherche bloquant l'envoi du formulaire*/
 .fauxinput {
   display:none !important;
 }

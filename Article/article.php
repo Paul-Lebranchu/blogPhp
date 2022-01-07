@@ -149,6 +149,45 @@ $resultatUser =$resUser->fetch();
 				</div>
 			</div>
 
+			<!-- Modal de suppression de commentaire-->
+			<div class="modal fade" id="delComModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Suppression de commentaire</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<p> Voulez-vous vraiment supprimer votre commentaire?</p>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" id="confirmDelCom" data-bs-dismiss="modal">Supprimer mon commentaire</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Modal d'édition de commentaire -->
+			<div class="modal fade" id="editComModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Modification d'article</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form>
+								<textarea class="form-control z-depth-1" rows="10" id="comEdit" name="comEdit"></textarea>
+								<p class='err' id='errComEdit' > </p>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" id="confirmEditCom" data-bs-dismiss="modal">Modifier mon commentaire</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annuler</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 
 		<?php echo $footer;?>
@@ -175,14 +214,15 @@ $resultatUser =$resUser->fetch();
 				let html = "";
 				for (let a = 0; a < data.length; a++) {
 
-					html += "<tr>";
+					html += "<tr id='" + data[a].id + "'>";
 						//image + pseudo
 						html += "<td> <figure>";
 						html += "<img class='rounded-circle' width='100px' src='"+data[a].image+"'>";
 						html += "<figcaption><a href='../Profil/profil.php?id="+data[a].auteur+"'>"+data[a].userName+"</a></figcaption>";
 						//bouton de suppression si c'est le bon utilisateur de connecter
 						if(auteur == data[a].auteur ){
-							html += "<button width='100' class='btn btn-danger' > Supprimer votre commentaire </button>";
+							html += "<div><button class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delComModal' data-bs-id='" + data[a].id + "'> Supprimer votre commentaire </button> </div>";
+							html += '<div><button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editComModal" data-bs-id="' + data[a].id + '" data-bs-com="' + data[a].contenu + '"> Modifier votre commentaire </button> </div>';
 						}
 						html += "</figure></td>";
 						//commentaire
@@ -202,6 +242,79 @@ $resultatUser =$resUser->fetch();
 		refreshCom();
 	})
 
+	//suprresion des com
+	//selection du bouton de suppresion de com + affichage modal
+	let delCom = document.getElementById('delComModal');
+	delCom.addEventListener('show.bs.modal',function(event){
+		let buttonDelCom = event.relatedTarget;
+		//lie fonction suppresion de com à bouton validataion de suppression
+		$('#confirmDelCom').click(function(){
+			//récupère l'id du commentaire
+			let id = buttonDelCom.getAttribute('data-bs-id');
+			//supprime le commentaire en appellant la fonction deleteCom
+			deleteCom(id);
+		});
+	});
+
+	//fonction supprimant le commentaires choissis
+	function deleteCom(id){
+		let ajax = new XMLHttpRequest();
+		ajax.open("POST", "../Commentaire/deleteCom.php", true);
+		ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		ajax.send( "id=" + id);
+		ajax.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {
+				//alerte confirmant la suppresion et redirection vers la liste des articles
+				alert("suppression réussi");
+				//raffrachit la page
+				location.reload();
+			}
+		}
+		return false;
+	}
+	//édition des com
+	//selection bouton + affichage modal
+	let editCom = document.getElementById('editComModal');
+	editCom.addEventListener('show.bs.modal',function(event){
+		let buttonDelCom = event.relatedTarget;
+		//récupère le com et l'ajoute au Formulaire
+		let com = buttonDelCom.getAttribute("data-bs-com");
+		$('#comEdit').html(com);
+		//lie fonction suppresion de com à bouton validataion de suppression
+		$('#confirmEditCom').click(function(){
+			//récupère l'id du commentaire
+			let id = buttonDelCom.getAttribute('data-bs-id');
+			//appelle la fonction d'édition de commentaire
+			editionCom(id);
+		});
+	});
+
+	//Fonction d'édition de commentaire
+	function editionCom(id){
+		//récupère le com
+		let com = document.getElementById("comEdit").value;
+		//si le com n'est pas vide, appelle script php
+		if(com != ""){
+			let ajax = new XMLHttpRequest();
+			ajax.open("POST", "../Commentaire/editCom.php", true);
+			ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			ajax.send( "id=" + id + "&com=" + com);
+			ajax.onreadystatechange = function () {
+				if (this.readyState == 4 && this.status == 200) {
+					//alerte confirmant la suppresion et redirection vers la liste des articles
+					alert("modification réussi");
+					//refraichit les com
+					location.reload();
+				}
+			}
+		}
+		else{
+			alert("Vous avez mis un commentaire vide, la modifcation n'a pas été prise en compte");
+			location.reload();
+		}
+		return false;
+	}
+
 	//partie suppresion de l'article
 	//bouton suppression faisant apparaitre modal de suppresion de profil
 	let delArticle = document.getElementById('delModal');
@@ -216,7 +329,6 @@ $resultatUser =$resUser->fetch();
 	function suppression(){
 		//récupère id de l'article
 		let idArticle = <?php echo $_GET['id']?>;
-
 		//requete envoyer lorsque l'on confirme la suppresion de l'article
 		let ajax = new XMLHttpRequest();
 		ajax.open("POST", "deleteArticle.php", true);
